@@ -1,0 +1,46 @@
+---
+- name: Configure Apache web server for static site
+  hosts: web_servers
+  become: true
+  tasks:
+    - name: Update package repositories
+      apt:
+        update_cache: yes
+
+    - name: Install Apache web server
+      apt:
+        name: apache2
+        state: present
+
+    - name: Install git
+      apt:
+        name: git
+        state: present
+
+
+    - name: Clone GitHub repository to a temporary directory
+      git:
+        repo: https://github.com/mionki/static-website-example.git
+        dest: /tmp/static_website
+    
+    - name: Copy contents to /var/www/html
+      command: cp -r /tmp/static_website/* /var/www/html
+
+    - name: Set ownership and permissions for web directory
+      file:
+        path: /var/www/html
+        owner: www-data
+        group: www-data
+        recurse: yes
+
+    - name: Set ownership and permissions for files in web directory
+      file:
+        path: /var/www/html/*
+        owner: www-data
+        group: www-data
+
+
+    - name: Restart Apache
+      service:
+        name: apache2
+        state: restarted

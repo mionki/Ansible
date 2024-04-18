@@ -1,0 +1,1 @@
+## Ansible Script to Install and configure apache server for sttic web hosting 
